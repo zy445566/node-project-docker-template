@@ -37,10 +37,15 @@ COPY . /app
 # 暴露端口
 EXPOSE 3000
 
-# docker入口文件,运行pm2启动
-CMD ["pm2","start","app/api.js","-i","4"]
-# 构建和运行
+# docker入口文件,运行pm2启动,并保证监听不断
+CMD ["pm2","start","app/api.js","-i","4","--no-daemon"]
+# 构建和运行,xxx是名字随便取
 # docker build -t xxx-app .
-# 其中NODE_ENV=test是测试环境，线上使用NODE_ENV=prod
-# docker run -e "NODE_ENV=prod" -dit --rm --name running-xxx-app -p 3000:3000 xxx-app 
+# 其中NODE_ENV=test是测试环境，线上使用NODE_ENV=production
+# docker run -e "NODE_ENV=production" -dit --rm --name running-xxx-app -p 7001:7001 xxx-app 
+# 进入容器
+# docker exec -it running-xxx-app bash
+# 停止容器
 # docker stop running-xxx-app
+# 查看日志
+# docker logs running-xxx-app
