@@ -38,7 +38,7 @@ COPY . /app
 EXPOSE 3000
 
 # docker入口文件,运行pm2启动,并保证监听不断
-CMD ["pm2","start","app/api.js","-i","4","--no-daemon"]
+CMD ["sh","docker-daemon.sh"]
 # 构建和运行,xxx是名字随便取
 # docker build -t xxx-app .
 # 其中NODE_ENV=test是测试环境，线上使用NODE_ENV=production
