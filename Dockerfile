@@ -15,7 +15,9 @@ ENV PATH  /node/node-$NODE_VERSION-linux-x64/bin:$PATH
 WORKDIR /app
 
 # 这步必须比复制文件前，如果package.json一样就不会重新安装项目依赖了
-COPY ./package.json /app
+COPY ./package*.json /app
+# # 如果是yarn则，复制该文件
+# COPY ./yarn.lock /app
 
 # 安装项目依赖
 RUN npm install cnpm -g --registry=https://registry.npm.taobao.org
