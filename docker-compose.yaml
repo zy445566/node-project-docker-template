@@ -1,0 +1,109 @@
+version: '3.6'
+# docker-compose up
+
+services:
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql-app
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    volumes:
+      - mysql-app-volume:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - node-app-network
+
+  mysql-gui:
+    image: phpmyadmin:latest
+    restart: always
+    environment:
+      - PMA_ARBITRARY=1
+    ports:
+      - "8086:80"
+    depends_on:
+      - mysql
+    networks:
+      - node-app-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-app
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    volumes:
+      - mongo-app-volume:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - node-app-network
+  
+  mongo-gui:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 123456
+      ME_CONFIG_MONGODB_URL: mongodb://root:123456@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongo
+    networks:
+      - node-app-network
+
+  redis:
+    image: redis:latest
+    command: [ "redis-server", "--appendonly","yes","--requirepass","123456"]
+    container_name: redis-app
+    restart: always
+    volumes:
+      - redis-app-volume:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - node-app-network
+
+  redis-gui:
+    image: redislabs/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+    networks:
+      - node-app-network
+
+  node-app:
+    image: xxxx-node-app
+    container_name: node-app
+    restart: always
+    environment:
+      NODE_ENV: "production"
+    ports:
+      - "3000:3000" # API端口
+    links:
+      - mysql
+      - mongo
+      - redis
+    depends_on:
+      - mysql
+      - mongo
+      - redis
+    networks:
+      - node-app-network
+
+volumes:
+  mysql-app-volume:
+  mongo-app-volume:
+  redis-app-volume:
+
+networks:
+  node-app-network:
+    name:  node-app-network
+    driver: bridge
